@@ -1,0 +1,33 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import math
+
+app = FastAPI(title="Loan EMI Calculator API")
+
+class LoanDetails(BaseModel):
+    loan_amount: float
+    annual_roi: float
+    tenure_years: int
+
+@app.post("/calculate_emi")
+def calculate_emi(details: LoanDetails):
+    P = details.loan_amount
+    R = details.annual_roi / 12 / 100
+    N = details.tenure_years * 12
+
+    if R == 0:
+        emi = P / N
+    else:
+        emi = P * R * math.pow(1 + R, N) / (math.pow(1 + R, N) - 1)
+
+    total_payment = emi * N
+    total_interest = total_payment - P
+
+    return {
+        "Loan Amount": P,
+        "Annual ROI (%)": details.annual_roi,
+        "Tenure (Years)": details.tenure_years,
+        "Monthly EMI": round(emi, 2),
+        "Total Payment": round(total_payment, 2),
+        "Total Interest": round(total_interest, 2)
+    }
