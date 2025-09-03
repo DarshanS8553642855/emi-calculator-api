@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EMI Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input { margin: 8px; padding: 6px; }
+    button { padding: 8px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Loan EMI Calculator</h2>
+  
+  <label>Loan Amount: </label>
+  <input type="number" id="amount"><br>
+  
+  <label>Interest Rate (% per annum): </label>
+  <input type="number" id="rate"><br>
+  
+  <label>Tenure (months): </label>
+  <input type="number" id="tenure"><br>
+  
+  <button onclick="calculateEMI()">Calculate EMI</button>
+  
+  <h3 id="result"></h3>
+
+  <script>
+    async function calculateEMI() {
+      const loanAmount = document.getElementById("amount").value;
+      const rate = document.getElementById("rate").value;
+      const tenure = document.getElementById("tenure").value;
+
+      const response = await fetch("https://emi-calculator-api-1em7.onrender.com/calculate_emi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          loanAmount: parseFloat(loanAmount),
+          interestRate: parseFloat(rate),
+          tenureMonths: parseInt(tenure)
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("result").innerText = "Your EMI is: " + data.emi;
+    }
+  </script>
+</body>
+</html>
